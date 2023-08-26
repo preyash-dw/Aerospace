@@ -39,6 +39,8 @@ const userSchema = new mongoose.Schema({
         like: Number,
         comment: Number,
         shareCount: Number,
+        retweet:Number,
+        createdAt:Date,
     }],
 });
 
@@ -130,7 +132,7 @@ app.get('/api/user/tweets/:id', async (req, res) => {
 app.post('/api/user/tweets/:id', async (req, res) => {
     try {
         const { id } = req.params; 
-        const { postDescription, like, comment, shareCount } = req.body;
+        const { postDescription, like, comment, shareCount,retweet,createdAt } = req.body;
 
         const user = await User.findById(id); 
         if (!user) {
@@ -142,6 +144,8 @@ app.post('/api/user/tweets/:id', async (req, res) => {
             like,
             comment,
             shareCount,
+            retweet,
+            createdAt,
         };
         user.tweets.push(newTweet);
         await user.save();
@@ -199,8 +203,7 @@ app.delete('/api/user/tweets/:userId/:tweetId', async (req, res) => {
       if (!tweet) {
         return res.status(404).json({ message: 'Tweet not found' });
       }
-  
-      tweet.remove();
+      await tweet.deleteOne();
       await user.save();
   
       res.status(200).json({ message: 'Tweet deleted successfully' });
